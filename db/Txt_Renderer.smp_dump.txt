@@ -1,0 +1,49 @@
+
+State Machine - |Txt_Renderer|Edge_Trigger:sens_t_SW|state
+Name state.00 state.10 state.01 
+state.00 0 0 0 
+state.01 1 0 1 
+state.10 1 1 0 
+
+State Machine - |Txt_Renderer|Edge_Trigger:sens_mode_SW|state
+Name state.00 state.10 state.01 
+state.00 0 0 0 
+state.01 1 0 1 
+state.10 1 1 0 
+
+State Machine - |Txt_Renderer|Edge_Trigger:TH_SW|state
+Name state.00 state.10 state.01 
+state.00 0 0 0 
+state.01 1 0 1 
+state.10 1 1 0 
+
+State Machine - |Txt_Renderer|Mem_Controller:mem_controller|state
+Name state.op_cplt state.w2_3 state.w2_2 state.w2_1 state.w1_2 state.w1_1 state.r2_4 state.r2_3 state.r2_2 state.r2_1 state.r1_3 state.r1_2 state.r1_1 state.idle 
+state.idle 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+state.r1_1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 
+state.r1_2 0 0 0 0 0 0 0 0 0 0 0 1 0 1 
+state.r1_3 0 0 0 0 0 0 0 0 0 0 1 0 0 1 
+state.r2_1 0 0 0 0 0 0 0 0 0 1 0 0 0 1 
+state.r2_2 0 0 0 0 0 0 0 0 1 0 0 0 0 1 
+state.r2_3 0 0 0 0 0 0 0 1 0 0 0 0 0 1 
+state.r2_4 0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+state.w1_1 0 0 0 0 0 1 0 0 0 0 0 0 0 1 
+state.w1_2 0 0 0 0 1 0 0 0 0 0 0 0 0 1 
+state.w2_1 0 0 0 1 0 0 0 0 0 0 0 0 0 1 
+state.w2_2 0 0 1 0 0 0 0 0 0 0 0 0 0 1 
+state.w2_3 0 1 0 0 0 0 0 0 0 0 0 0 0 1 
+state.op_cplt 1 0 0 0 0 0 0 0 0 0 0 0 0 1 
+
+State Machine - |Txt_Renderer|core_sys:core|core_sys_mm_interconnect_0:mm_interconnect_0|altera_merlin_burst_adapter:from_hps_s1_burst_adapter|altera_merlin_burst_adapter_13_1:altera_merlin_burst_adapter_13_1.burst_adapter|state
+Name state.ST_IDLE state.ST_UNCOMP_WR_SUBBURST state.ST_UNCOMP_TRANS state.ST_COMP_TRANS 
+state.ST_IDLE 0 0 0 0 
+state.ST_COMP_TRANS 1 0 0 1 
+state.ST_UNCOMP_TRANS 1 0 1 0 
+state.ST_UNCOMP_WR_SUBBURST 1 1 0 0 
+
+State Machine - |Txt_Renderer|core_sys:core|core_sys_mm_interconnect_0:mm_interconnect_0|altera_merlin_burst_adapter:to_hps_s1_burst_adapter|altera_merlin_burst_adapter_13_1:altera_merlin_burst_adapter_13_1.burst_adapter|state
+Name state.ST_IDLE state.ST_UNCOMP_WR_SUBBURST state.ST_UNCOMP_TRANS state.ST_COMP_TRANS 
+state.ST_IDLE 0 0 0 0 
+state.ST_COMP_TRANS 1 0 0 1 
+state.ST_UNCOMP_TRANS 1 0 1 0 
+state.ST_UNCOMP_WR_SUBBURST 1 1 0 0 

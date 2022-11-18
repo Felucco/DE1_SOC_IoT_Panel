@@ -1,0 +1,46 @@
+//Only the 95 ASCII printable characters
+
+`include "SP_RAM.v"
+
+module Font_BMP #(
+    parameter FONT_W=10,
+    parameter FONT_H=12
+) (
+    input clk,rst,en,
+    input off_limits,
+    input [6:0] cc,
+    input [$clog2(FONT_W*FONT_H)-1:0] fi,
+    input set_font, input [FONT_W*FONT_H-1:0] in_font_bmp,
+    output reg pxi
+);
+
+wire [FONT_W*FONT_H-1:0] font_bmp;
+reg [6:0] cpc;
+reg cc_np;
+
+assign font_bmp = set_font ? in_font_bmp : {FONT_W*FONT_H{1'bz}};
+
+always @(*) begin
+    if (cc >= 32 & cc < 127) begin
+        cpc=cc-7'd32;
+        cc_np=1'b0;
+    end else begin
+        cpc=7'd0;
+        cc_np=1'b1;
+    end
+end
+
+SP_RAM #(.WIDTH(FONT_W*FONT_H),.DEPTH(95)) core_mem (
+    .clk(clk),.rst(rst),.en(en),
+    .w_nr(set_font&~cc_np),
+    .addr(cpc), .data(font_bmp));
+
+always @(*) begin
+    if (off_limits | set_font | fi>=FONT_W*FONT_H | cc_np) pxi=1'b0;
+    else begin
+        if (en) pxi=font_bmp[fi];
+        else pxi=1'b0;
+    end
+end
+    
+endmodule

@@ -1,0 +1,16 @@
+<sld_project_info>
+  <project>
+    <hash md5_digest_80b="11005a87187e3a3efbdc"/>
+  </project>
+  <file_info>
+    <file device="5CSEMA5F31C6" path="Txt_Renderer.sof" usercode="0xFFFFFFFF"/>
+  </file_info>
+  <sld_infos>
+    <sld_info hpath="core_sys:core" name="core">
+      <assignment_values>
+        <assignment_value text="QSYS_NAME core_sys HAS_SOPCINFO 1 GENERATION_ID 1667838990"/>
+      </assignment_values>
+      <parameters/>
+    </sld_info>
+  </sld_infos>
+</sld_project_info>

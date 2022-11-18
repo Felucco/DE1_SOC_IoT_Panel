@@ -1,0 +1,7 @@
+module Buff_Controller (
+	input clk, rst, en, trg,
+	input [7:0] data_in,
+	output [12:0] mem_addr,
+	output reg [7:0] out [99:0]
+);
+endmodule

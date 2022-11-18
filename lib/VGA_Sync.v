@@ -1,0 +1,56 @@
+//Considering an input clock of double the frequency of the actual VGA one
+`define DOUBLE_CLOCK //Define if the pixel clock is double the frequenc of the actual VGA one
+
+module VGA_Sync #(
+    parameter SYNC_H = 192,
+    parameter BP_H = 96,
+    parameter DISP_H = 1280,
+    parameter FP_H = 32,
+    parameter SYNC_V = 2,
+    parameter BP_V = 33,
+    parameter DISP_V = 480,
+    parameter FP_V = 10
+)  (
+		input clk,rst,en,
+		output vga_blank_n,vga_sync_n,vga_hsync,vga_vsync,eof,
+`ifdef DOUBLE_CLOCK
+        output [$clog2(DISP_H/2)-1:0] x_coord,
+`else
+        output [$clog2(DISP_H)-1:0] x_coord,
+`endif
+        output [$clog2(DISP_V)-1:0] y_coord
+);
+
+    parameter N_BIT_H = $clog2(SYNC_H+BP_H+DISP_H+FP_H);
+    parameter N_BIT_V = $clog2(SYNC_V+BP_V+DISP_V+FP_V);
+
+`ifdef DOUBLE_CLOCK
+    parameter N_BIT_RH = $clog2(DISP_H/2);
+`else
+    parameter N_BIT_RH = $clog2(DISP_H);
+`endif  
+    parameter N_BIT_RV = $clog2(DISP_V);
+
+    wire eol, d_h, d_v;
+    wire [N_BIT_H-1:0] x_coord_raw;
+    wire [N_BIT_V-1:0] y_coord_raw;
+
+	Sync_Gen #(.SYNC(SYNC_H),.BACK_P(BP_H),.DISP(DISP_H),.FRONT_P(FP_H))
+                HSYNC (.clk(clk),.rst(rst),.en(en),.eol(eol),
+                .sync(vga_hsync),.d(d_h),.coord(x_coord_raw));
+	
+	Sync_Gen #(.SYNC(SYNC_V),.BACK_P(BP_V),.DISP(DISP_V),.FRONT_P(FP_V))
+                VSYNC (.clk(clk),.rst(rst),.en(eol),.eol(eof),
+                .sync(vga_vsync),.d(d_v),.coord(y_coord_raw));
+    
+
+`ifdef DOUBLE_CLOCK
+    assign x_coord=x_coord_raw[N_BIT_RH:1];
+`else
+    assign x_coord=x_coord_raw[N_BIT_RH-1:0];
+`endif   
+    assign y_coord=y_coord_raw[N_BIT_RV-1:0];
+    assign vga_blank_n=d_h&d_v;
+    assign vga_sync_n=1'b0;
+
+endmodule
