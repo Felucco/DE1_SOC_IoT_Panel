@@ -8,29 +8,18 @@ module Buff_Controller (
 	localparam START_LOC = 13'h800;
 	
 	reg [6:0] tmp_addr;
-	wire [6:0] cnt_out, en_line;
-	reg [7:0] core_buf [99:0];
+	wire [6:0] cnt_out;
+	wire [7:0] core_buf [99:0];
+	
+	wire [99:0] en_line;
 
 	genvar idx;
 	generate
-		for (idx = 0; idx<100; idx=idx+1) begin
+		for (idx = 0; idx<100; idx=idx+1) begin: gen_loop
 			assign out[8*(idx+1)-1:8*idx]= core_buf[idx];
+			D_FF_Reg #(.N_BIT(8)) buf_reg (.clk(clk),.rst(rst),.en(en_line[idx]),.d(data_in),.q(core_buf[idx]));
 		end
 	endgenerate
-	
-	always @(posedge clk or posedge rst) begin: buff_wr_ctrl
-		if (rst) begin
-			for (tmp_addr=0;tmp_addr<100;tmp_addr+=1) begin
-				core_buf[tmp_addr] <= 8'd0;
-			end
-		end else begin
-			if (en) begin
-				for (tmp_addr=0;tmp_addr<100;tmp_addr+=1) begin
-					if (tmp_addr == en_line) core_buf[tmp_addr]<=data_in;
-				end
-			end
-		end
-	end
 	
 	wire cnt_en;
 	wire refr; //Refreshing
@@ -44,8 +33,8 @@ module Buff_Controller (
 		
 	assign refr = cnt_out > 7'd0;
 
-	assign en_line = refr ? cnt_out-1 : 100;
+	assign en_line = refr ? 100'h1 << cnt_out-1 : 100'h0;
 	
-	assign mem_addr = en ? START_LOC+cnt_out : 13'hz;
+	assign mem_addr = en ? START_LOC+cnt_out : 13'h0;
 	
 endmodule

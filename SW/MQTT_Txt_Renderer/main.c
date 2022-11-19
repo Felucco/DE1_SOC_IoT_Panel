@@ -86,6 +86,20 @@ int main (){
 	sprintf(out_msg,"M-%u.%u",old_mode,old_period);
 	AMQTT_Publish(&amqtt_instance,out_msg,pub_topic,1);
 
+	uint8_t graph_values[100];
+	//uint16_t *gv_16b = (uint16_t*) graph_values;
+	size_t i;
+	uint8_t check;
+	for (i = 0; i < 100; i++)
+	{
+		graph_values[i]=random()%240;
+		write_8b(graph_values[i],0x800+i);
+		check=read_8b(0x800+i);
+		if (check != graph_values[i]) printf("Check error for %d: expected %d and found %d\n",0x800+i,graph_values[i],check);
+	}
+	
+	
+
 	while (1)
 	{
 		new_mode=get_sensor_mode();

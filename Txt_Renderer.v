@@ -64,6 +64,7 @@ module Txt_Renderer(
 	
 	input       [9:0]  SW,
 	input			[3:0]  KEY,
+	output		[9:0]	 LEDR,
 	
 	output VGA_CLK,
 	output VGA_BLANK_N,
@@ -81,7 +82,7 @@ module Txt_Renderer(
 	wire [31:0] to_HPS, from_HPS;
 
 	wire [7:0] p1_r, p1_w, p2_r, p2_w;
-	wire [12:0] p1_addr, p2_addr;
+	wire [12:0] p1_addr, p2_addr, p2_char_addr, p2_graph_addr;
 	wire p1_we, p2_we;
 
 	wire [511:0] font_data;
@@ -190,7 +191,7 @@ module Txt_Renderer(
 	);
 	
 	wire screen_eof;
-	wire [9:0] px_x, px_x_p2;
+	wire [9:0] px_x, px_x_p1;
 	wire [8:0] px_y;
 
 	 VGA_Sync vga_sync (
@@ -199,23 +200,23 @@ module Txt_Renderer(
 		.vga_hsync(VGA_HS),.vga_vsync(VGA_VS),.eof(screen_eof),
 		.x_coord(px_x), .y_coord(px_y));
 	
-	assign px_x_p2 = px_x + 2; //Per considerare i due colpi di clock di ritardo
+	assign px_x_p1 = px_x + 1; //Per considerare i due colpi di clock di ritardo ma con clock a frequenza doppia
 		
 	wire [9:0] ci; // 42 x 22 caratteri = 924 -> 10 bit
 	wire px_off_lims;
 	
 	CI_Gen #(.FONT_W(15),.FONT_H(21),.SCREEN_W(640),.SCREEN_H(480)) char_index_gen (
-		.px(px_x_p2), .py(px_y), .ci(ci),.off_limits(px_off_lims));
+		.px(px_x_p1), .py(px_y), .ci(ci),.off_limits(px_off_lims));
 	
 	wire [8:0] fi; // Font 15 x 21 -> 315px -> 9 bit
 	
 	FI_Gen #(.FONT_W(15),.FONT_H(21),.SCREEN_W(640),.SCREEN_H(480)) font_index_gen (
-		.px(px_x_p2), .py(px_y), .fi(fi));
+		.px(px_x_p1), .py(px_y), .fi(fi));
 		
 	// Char memory Lookup
 	wire [6:0] px_char;
 	
-	assign p2_addr = {3'b000,ci};
+	assign p2_char_addr = {3'b000,ci};
 	assign px_char = p2_r[6:0];
 	
 	wire pxi;
@@ -233,8 +234,10 @@ module Txt_Renderer(
 	
 	CNT #(.N_BIT(3)) theme (.clk(CLOCK_50), .rst(~KEY[0]), .en(th_switcher), .d_nu(1'b0), .cnt(th));
 	
+	wire [7:0] txt_R, txt_G, txt_B;
+	
 	Theme_Handler TH (
-		.pxi(pxi),.theme(th),.R(VGA_R),.G(VGA_G),.B(VGA_B));
+		.pxi(pxi),.theme(th),.R(txt_R),.G(txt_G),.B(txt_B));
 	
 	T_FF TFF (.clk(CLOCK_50),.rst(~KEY[0]),.t(1'b1),.q(VGA_CLK));
 	
@@ -250,9 +253,6 @@ module Txt_Renderer(
 	
 	BCD_7Seg sens_mode_7seg (.A({1'b0,sens_mode}),.HEX0(HEX5));
 	assign HEX4=7'b111_1111;
-	assign HEX2=7'b111_1111;
-	assign HEX1=7'b111_1111;
-	assign HEX0=7'b111_1111;
 	
 	// Sensor update period handler
 	
@@ -269,4 +269,87 @@ module Txt_Renderer(
 	assign to_HPS[27:24] = sens_t_mod;
 	
 	BCD_7Seg sens_t_7seg (.A(sens_t_mod),.HEX0(HEX3));
+	
+	
+	assign p2_addr = SW[0] ? p2_graph_addr : p2_char_addr;
+	
+	// Graph mode: set switch 0 to go to graph mode from text mode
+	
+	//1: Update trigger generator
+	
+	wire hs_update_trg, trg_addr;
+	assign trg_addr = p1_addr==13'h8A0;
+	Edge_Trigger hs_update_ET (.clk(CLOCK_50), .rst(~KEY[0]), .in(trg_addr),.out(hs_update_trg));
+	
+	reg led_set;
+	assign LEDR[0]=led_set;
+	always @(posedge CLOCK_50 or posedge ~KEY[0]) begin
+		if (~KEY[0]) led_set <= 1'b0;
+		else if (hs_update_trg) led_set<=1'b1;
+	end
+	
+	assign p2_we = 0;
+	
+	//2: Column heights buffer
+	
+	wire [100*8-1:0] hs_buf;
+	
+	Buff_Controller Buff_CNTL(
+		.clk(CLOCK_50), .rst(~KEY[0]), .en(SW[0]), .trg(hs_update_trg),
+		.data_in(p2_r),
+		.mem_addr(p2_graph_addr),
+		.out(hs_buf)
+	);
+	
+	//3: Linear interpolators + Pixel checkers
+	
+	wire [4:0] pxy_control;
+	
+	genvar interpol_idx;
+	generate
+		for (interpol_idx=0;interpol_idx<5;interpol_idx=interpol_idx+1) begin: PX_Interpolator_Gen
+			if (interpol_idx<2) begin
+				PX_Lin_Interpol #(
+					 .N_COLS(20),
+					 .SCREEN_W(640),
+					 .SCREEN_H(480)
+				) PX_Interpol (
+					 .col_hs(hs_buf[(20*(interpol_idx+1)*8)-1:(20*interpol_idx*8)]),
+					 .px(px_x),.py(480-px_y),.en(SW[0]&sens_mode[interpol_idx]),
+					 .pxy_line(pxy_control[interpol_idx])
+				);
+			end else begin
+				PX_Lin_Interpol #(
+					 .N_COLS(20),
+					 .SCREEN_W(640),
+					 .SCREEN_H(480)
+				) PX_Interpol (
+					 .col_hs(hs_buf[(20*(interpol_idx+1)*8)-1:(20*interpol_idx*8)]),
+					 .px(px_x),.py(480-px_y),.en(SW[0]&sens_mode[2]),
+					 .pxy_line(pxy_control[interpol_idx])
+				);
+			end
+		end
+	endgenerate
+	
+	
+	//4: Pixel Theme Handler
+	
+	wire [7:0] graph_R, graph_G, graph_B;
+	
+	Graph_TH_Handler G_TH_Handler (.px_code(pxy_control),
+												.graph_R(graph_R), .graph_G(graph_G), .graph_B(graph_B));
+									
+	//Graph mode switching
+	
+	assign VGA_R = SW[0] ? graph_R : txt_R;
+	assign VGA_G = SW[0] ? graph_G : txt_G;
+	assign VGA_B = SW[0] ? graph_B : txt_B;
+	
+	BCD_7Seg h2_7s (.A(p2_addr[11:8]),.HEX0(HEX2));
+	BCD_7Seg h1_7s (.A(p2_addr[7:4]),.HEX0(HEX1));
+	BCD_7Seg h0_7s (.A(p2_addr[3:0]),.HEX0(HEX0));
+	assign to_HPS[23] = SW[0];
+	
+	
 endmodule

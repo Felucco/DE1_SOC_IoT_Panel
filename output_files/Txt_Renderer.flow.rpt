@@ -1,5 +1,5 @@
 Flow report for Txt_Renderer
-Wed Nov 16 19:31:21 2022
+Sat Nov 19 01:00:36 2022
 Quartus Prime Version 21.1.1 Build 850 06/23/2022 SJ Lite Edition
 
 
@@ -41,25 +41,25 @@ https://fpgasoftware.intel.com/eula.
 +-------------------------------------------------------------------------------+
 ; Flow Summary                                                                  ;
 +---------------------------------+---------------------------------------------+
-; Flow Status                     ; Successful - Wed Nov 16 19:31:21 2022       ;
+; Flow Status                     ; Successful - Sat Nov 19 01:00:05 2022       ;
 ; Quartus Prime Version           ; 21.1.1 Build 850 06/23/2022 SJ Lite Edition ;
 ; Revision Name                   ; Txt_Renderer                                ;
 ; Top-level Entity Name           ; Txt_Renderer                                ;
 ; Family                          ; Cyclone V                                   ;
 ; Device                          ; 5CSEMA5F31C6                                ;
 ; Timing Models                   ; Final                                       ;
-; Logic utilization (in ALMs)     ; N/A                                         ;
-; Total registers                 ; 812                                         ;
-; Total pins                      ; 213                                         ;
+; Logic utilization (in ALMs)     ; 1,373 / 32,070 ( 4 % )                      ;
+; Total registers                 ; 1653                                        ;
+; Total pins                      ; 223 / 457 ( 49 % )                          ;
 ; Total virtual pins              ; 0                                           ;
-; Total block memory bits         ; 95,461                                      ;
-; Total DSP Blocks                ; 1                                           ;
+; Total block memory bits         ; 95,461 / 4,065,280 ( 2 % )                  ;
+; Total DSP Blocks                ; 11 / 87 ( 13 % )                            ;
 ; Total HSSI RX PCSs              ; 0                                           ;
 ; Total HSSI PMA RX Deserializers ; 0                                           ;
 ; Total HSSI TX PCSs              ; 0                                           ;
 ; Total HSSI PMA TX Serializers   ; 0                                           ;
-; Total PLLs                      ; 0                                           ;
-; Total DLLs                      ; 1                                           ;
+; Total PLLs                      ; 0 / 6 ( 0 % )                               ;
+; Total DLLs                      ; 1 / 4 ( 25 % )                              ;
 +---------------------------------+---------------------------------------------+
 
 
@@ -68,7 +68,7 @@ https://fpgasoftware.intel.com/eula.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 11/16/2022 19:28:03 ;
+; Start date & time ; 11/19/2022 00:55:18 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; Txt_Renderer        ;
 +-------------------+---------------------+
@@ -79,7 +79,7 @@ https://fpgasoftware.intel.com/eula.
 +---------------------------------------+------------------------------------------------------------------------+---------------+------------------------------+------------+
 ; Assignment Name                       ; Value                                                                  ; Default Value ; Entity Name                  ; Section Id ;
 +---------------------------------------+------------------------------------------------------------------------+---------------+------------------------------+------------+
-; COMPILER_SIGNATURE_ID                 ; 180502803039583.166862328115823                                        ; --            ; --                           ; --         ;
+; COMPILER_SIGNATURE_ID                 ; 180502803039583.166881571660549                                        ; --            ; --                           ; --         ;
 ; ECO_REGENERATE_REPORT                 ; On                                                                     ; Off           ; --                           ; --         ;
 ; HPS_ISW_FILE                          ; core_sys/synthesis/submodules/sequencer/sdram_io.pre.h                 ; --            ; core_sys_hps_0_hps_io_border ; --         ;
 ; HPS_ISW_FILE                          ; core_sys/synthesis/submodules/sequencer/alt_types.pre.h                ; --            ; core_sys_hps_0_hps_io_border ; --         ;
@@ -133,8 +133,11 @@ https://fpgasoftware.intel.com/eula.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:21     ; 1.0                     ; 682 MB              ; 00:00:29                           ;
-; Total                ; 00:00:21     ; --                      ; --                  ; 00:00:29                           ;
+; Analysis & Synthesis ; 00:00:20     ; 1.0                     ; 699 MB              ; 00:00:31                           ;
+; Fitter               ; 00:01:17     ; 1.1                     ; 2695 MB             ; 00:02:07                           ;
+; Assembler            ; 00:00:09     ; 1.0                     ; 573 MB              ; 00:00:09                           ;
+; Timing Analyzer      ; 00:00:28     ; 1.2                     ; 1345 MB             ; 00:00:34                           ;
+; Total                ; 00:02:14     ; --                      ; --                  ; 00:03:21                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
@@ -144,6 +147,9 @@ https://fpgasoftware.intel.com/eula.
 ; Module Name          ; Machine Hostname ; OS Name      ; OS Version   ; Processor type ;
 +----------------------+------------------+--------------+--------------+----------------+
 ; Analysis & Synthesis ; feluccoGaruda    ; Garuda Linux ; Garuda Linux ; x86_64         ;
+; Fitter               ; feluccoGaruda    ; Garuda Linux ; Garuda Linux ; x86_64         ;
+; Assembler            ; feluccoGaruda    ; Garuda Linux ; Garuda Linux ; x86_64         ;
+; Timing Analyzer      ; feluccoGaruda    ; Garuda Linux ; Garuda Linux ; x86_64         ;
 +----------------------+------------------+--------------+--------------+----------------+
 
 
@@ -151,6 +157,9 @@ https://fpgasoftware.intel.com/eula.
 ; Flow Log ;
 ------------
 quartus_map --read_settings_files=on --write_settings_files=off Txt_Renderer -c Txt_Renderer
+quartus_fit --read_settings_files=off --write_settings_files=off Txt_Renderer -c Txt_Renderer
+quartus_asm --read_settings_files=off --write_settings_files=off Txt_Renderer -c Txt_Renderer
+quartus_sta Txt_Renderer -c Txt_Renderer
 
 
 
