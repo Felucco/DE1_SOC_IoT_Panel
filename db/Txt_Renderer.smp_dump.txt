@@ -1,4 +1,10 @@
 
+State Machine - |Txt_Renderer|Debug_SHR:buff_debug_SHR|Edge_Trigger:oa_ET|state
+Name state.00 state.10 state.01 
+state.00 0 0 0 
+state.01 1 0 1 
+state.10 1 1 0 
+
 State Machine - |Txt_Renderer|Edge_Trigger:hs_update_ET|state
 Name state.00 state.10 state.01 
 state.00 0 0 0 

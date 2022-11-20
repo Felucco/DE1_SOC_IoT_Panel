@@ -1,0 +1,18 @@
+module Axes_Checker #(
+	parameter OFFSET=3,
+	parameter WIDTH=3,
+	parameter SCREEN_W=640,
+   parameter SCREEN_H=480) (
+	input [$clog2(SCREEN_W)-1:0] px,
+   input [$clog2(SCREEN_H)-1:0] py,
+   input en,
+   output pxy_line);
+	
+	reg x_ax, y_ax;
+	assign pxy_line=x_ax|y_ax;
+	
+	always @(*) begin: x_ax_check
+		
+	end
+
+endmodule

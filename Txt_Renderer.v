@@ -270,8 +270,7 @@ module Txt_Renderer(
 	
 	BCD_7Seg sens_t_7seg (.A(sens_t_mod),.HEX0(HEX3));
 	
-	
-	assign p2_addr = SW[0] ? p2_graph_addr : p2_char_addr;
+	assign p2_addr = SW[0] ? (SW[1] ? 13'h800+SW[8:2] : p2_graph_addr) : p2_char_addr;
 	
 	// Graph mode: set switch 0 to go to graph mode from text mode
 	
@@ -301,9 +300,38 @@ module Txt_Renderer(
 		.out(hs_buf)
 	);
 	
+	/* DEBUG SECTION*/
+	
+	wire [5:0] debug_addr;
+	wire [12:0] debug_data;
+	
+	Debug_SHR #(
+        .WIDTH(13),
+        .DEPTH(50)
+    ) buff_debug_SHR (
+        .clk(CLOCK_50), .rst(~KEY[0]), .en(SW[0]),
+        .trg(hs_update_trg), .choice_in(~KEY[3]),
+        .data_in(p2_addr), .addr_out(debug_addr),
+        .data_out(debug_data)
+    );
+		
+		//BCD_7Seg h4_7s (.A(p2_addr[7:4]),.HEX0(HEX4));
+		//BCD_7Seg h3_7s (.A(p2_addr[3:0]),.HEX0(HEX3));
+		assign HEX2=7'b111_1111;
+		assign HEX1=7'b111_1111;
+		assign HEX0=7'b111_1111;
+		//BCD_7Seg h1_7s (.A(p2_r[7:4]),.HEX0(HEX1));
+		//BCD_7Seg h0_7s (.A(p2_r[3:0]),.HEX0(HEX0));
+	/* END OF DEBUG SECTION */
+	
 	//3: Linear interpolators + Pixel checkers
 	
-	wire [4:0] pxy_control;
+	wire [5:0] pxy_control;
+	
+	wire [3:0] r_shift;
+	assign r_shift=SW[8:6];
+	
+	localparam OFFSET=7;
 	
 	genvar interpol_idx;
 	generate
@@ -315,7 +343,7 @@ module Txt_Renderer(
 					 .SCREEN_H(480)
 				) PX_Interpol (
 					 .col_hs(hs_buf[(20*(interpol_idx+1)*8)-1:(20*interpol_idx*8)]),
-					 .px(px_x),.py(480-px_y),.en(SW[0]&sens_mode[interpol_idx]),
+					 .px(px_x-r_shift-OFFSET),.py(480-px_y),.en(SW[0]&sens_mode[interpol_idx]),
 					 .pxy_line(pxy_control[interpol_idx])
 				);
 			end else begin
@@ -325,15 +353,23 @@ module Txt_Renderer(
 					 .SCREEN_H(480)
 				) PX_Interpol (
 					 .col_hs(hs_buf[(20*(interpol_idx+1)*8)-1:(20*interpol_idx*8)]),
-					 .px(px_x),.py(480-px_y),.en(SW[0]&sens_mode[2]),
+					 .px(px_x-r_shift-OFFSET),.py(480-px_y),.en(SW[0]&sens_mode[2]),
 					 .pxy_line(pxy_control[interpol_idx])
 				);
 			end
 		end
 	endgenerate
 	
+	//4: Axes generator
+	Axes_Checker #(
+		.OFFSET(7),.WIDTH(5),
+		.W_LEN(600),.H_LEN(450),
+		.SCREEN_W(640),.SCREEN_H(480)) (
+		.px(px_x-r_shift),.py(480-px_y),
+		.en(SW[0]),
+		.pxy_line(pxy_control[5]));
 	
-	//4: Pixel Theme Handler
+	//5: Pixel Theme Handler
 	
 	wire [7:0] graph_R, graph_G, graph_B;
 	
@@ -346,9 +382,6 @@ module Txt_Renderer(
 	assign VGA_G = SW[0] ? graph_G : txt_G;
 	assign VGA_B = SW[0] ? graph_B : txt_B;
 	
-	BCD_7Seg h2_7s (.A(p2_addr[11:8]),.HEX0(HEX2));
-	BCD_7Seg h1_7s (.A(p2_addr[7:4]),.HEX0(HEX1));
-	BCD_7Seg h0_7s (.A(p2_addr[3:0]),.HEX0(HEX0));
 	assign to_HPS[23] = SW[0];
 	
 	

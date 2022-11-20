@@ -60,9 +60,6 @@ int main (){
 	to_hps_addr  = virtual_base + HPS_0_TO_HPS_BASE;
 	from_hps_addr = virtual_base + HPS_0_FROM_HPS_BASE;
 
-	uint8_t d8;
-	uint16_t d16;
-
 	*(uint32_t*)from_hps_addr=0;
 	
 	char in_txt [H_CH] = {0};
@@ -72,7 +69,7 @@ int main (){
 	const char* test_topic="unipr/prova/mqttSUB";
 	const char* pub_topic="unipr/prova/mqttPUB";
 
-	clear_mem();
+	//clear_mem();
 
 	AMQTT_Init(&amqtt_instance,MQTT_ADDR,MQTT_PORT);
 
@@ -89,15 +86,12 @@ int main (){
 	uint8_t graph_values[100];
 	//uint16_t *gv_16b = (uint16_t*) graph_values;
 	size_t i;
-	uint8_t check;
 	for (i = 0; i < 100; i++)
 	{
 		graph_values[i]=random()%240;
 		write_8b(graph_values[i],0x800+i);
-		check=read_8b(0x800+i);
-		if (check != graph_values[i]) printf("Check error for %d: expected %d and found %d\n",0x800+i,graph_values[i],check);
 	}
-	
+	write_8b(0,0x8a0);
 	
 
 	while (1)

@@ -1,5 +1,5 @@
 module Graph_TH_Handler (
-	input [4:0] px_code,
+	input [5:0] px_code,
 	output [7:0] graph_R, graph_G, graph_B);
 	
 	reg [10:0] tmp_R, tmp_G, tmp_B; //11 bits to avoid overflow
@@ -36,8 +36,8 @@ module Graph_TH_Handler (
 				(px_code[4] ? MAGZ_B : 0);
 	end
 	
-	assign graph_R=tmp_R > 255 ? 255 : tmp_R;
-	assign graph_G=tmp_G > 255 ? 255 : tmp_G;
-	assign graph_B=tmp_B > 255 ? 255 : tmp_B;
+	assign graph_R=(tmp_R > 255 | px_code[5]) ? 255 : tmp_R;
+	assign graph_G=(tmp_G > 255 | px_code[5]) ? 255 : tmp_G;
+	assign graph_B=(tmp_B > 255 | px_code[5]) ? 255 : tmp_B;
 
 endmodule

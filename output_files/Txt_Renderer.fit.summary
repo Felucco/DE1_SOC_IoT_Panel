@@ -1,12 +1,12 @@
-Fitter Status : Successful - Sat Nov 19 00:59:53 2022
+Fitter Status : Successful - Sun Nov 20 00:55:25 2022
 Quartus Prime Version : 21.1.1 Build 850 06/23/2022 SJ Lite Edition
 Revision Name : Txt_Renderer
 Top-level Entity Name : Txt_Renderer
 Family : Cyclone V
 Device : 5CSEMA5F31C6
 Timing Models : Final
-Logic utilization (in ALMs) : 1,373 / 32,070 ( 4 % )
-Total registers : 1653
+Logic utilization (in ALMs) : 1,600 / 32,070 ( 5 % )
+Total registers : 1660
 Total pins : 223 / 457 ( 49 % )
 Total virtual pins : 0
 Total block memory bits : 95,461 / 4,065,280 ( 2 % )

@@ -1,0 +1,18 @@
+module Debug_SHR #(
+		parameter WIDTH=8,
+		parameter DEPTH=16
+	)(
+		input clk, rst, en,
+		input trg, choice_in,
+		input [WIDTH-1:0] data_in,
+		output [$clog2(DEPTH)-1:0] addr_out,
+		output [WIDTH-1:0] data_out);
+
+	genvar in_bit;
+	generate
+		for (in_bit=0; in_bit<WIDTH; in_bit=in_bit+1) begin
+			SHR #(.N_BIT(DEPTH)) core_shr (.clk(clk),.rst(rst),.en(en),
+											.
+	
+endmodule
+	
