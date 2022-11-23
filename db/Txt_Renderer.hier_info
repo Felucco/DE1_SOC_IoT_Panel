@@ -189,25 +189,25 @@ SW[4] => p2_addr.DATAB
 SW[5] => p2_addr.DATAB
 SW[6] => p2_addr.DATAB
 SW[6] => Add2.IN10
-SW[6] => Add4.IN10
-SW[6] => Add6.IN10
+SW[6] => Add5.IN10
 SW[6] => Add8.IN10
-SW[6] => Add10.IN10
-SW[6] => Add12.IN10
+SW[6] => Add11.IN10
+SW[6] => Add14.IN10
+SW[6] => Add17.IN10
 SW[7] => p2_addr.DATAB
 SW[7] => Add2.IN9
-SW[7] => Add4.IN9
-SW[7] => Add6.IN9
+SW[7] => Add5.IN9
 SW[7] => Add8.IN9
-SW[7] => Add10.IN9
-SW[7] => Add12.IN9
+SW[7] => Add11.IN9
+SW[7] => Add14.IN9
+SW[7] => Add17.IN9
 SW[8] => p2_addr.DATAB
 SW[8] => Add2.IN8
-SW[8] => Add4.IN8
-SW[8] => Add6.IN8
+SW[8] => Add5.IN8
 SW[8] => Add8.IN8
-SW[8] => Add10.IN8
-SW[8] => Add12.IN8
+SW[8] => Add11.IN8
+SW[8] => Add14.IN8
+SW[8] => Add17.IN8
 SW[9] => SW[9].IN2
 KEY[0] => KEY[0].IN1
 KEY[1] => _.IN1
@@ -49626,7 +49626,7 @@ en => always1.IN1
 pxy_line <= pxy_line.DB_MAX_OUTPUT_PORT_TYPE
 
 
-|Txt_Renderer|Axes_Checker:comb_319
+|Txt_Renderer|Axes_Checker:comb_434
 px[0] => LessThan0.IN20
 px[0] => LessThan1.IN20
 px[0] => LessThan8.IN20
